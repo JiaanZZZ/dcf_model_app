@@ -2,6 +2,7 @@
 
 A bilingual (English / 中文) interactive DCF calculator built with Streamlit.  
 Reverse-engineer what the market is pricing in, or stress-test your own growth assumptions — stock by stock, earnings by earnings.
+<img width="1899" height="1029" alt="Screenshot 2026-03-07 at 16 53 42" src="https://github.com/user-attachments/assets/d5b25b75-39f8-42ea-bb25-78d1e99ce219" />
 
 ---
 
