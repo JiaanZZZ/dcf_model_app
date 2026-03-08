@@ -1,4 +1,9 @@
 import os
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
@@ -8,7 +13,8 @@ import streamlit as st
 from lang import LANG
 from dcf import fair_value, implied_growth, eps_path
 from data import HAS_YF, fetch_stock_data
-from ai_analysis import HAS_ANTHROPIC, analyze_news_with_claude, sentiment_badge, dcf_impact_label
+from ai_analysis import (HAS_ANTHROPIC, analyze_news_with_claude, analyze_stock_deep,
+                         sentiment_badge, dcf_impact_label)
 
 
 # ── Sidebar ───────────────────────────────────────────────────────────────
@@ -275,6 +281,42 @@ def render_heatmap(price: float, eps: float, g: float, r: float, n: int, pe_exit
     plt.close()
 
 
+# ── Deep DCF Analysis tab ─────────────────────────────────────────────────
+
+def render_deep_analysis(api_key: str, ticker: str, price: float, eps: float,
+                         lang: str, L: dict):
+    st.subheader(L["deep_title"])
+    st.caption(f"**{ticker}** · ${price:.2f} · EPS ${eps:.2f} · TTM PE {price/eps:.1f}x")
+
+    macro_context = st.text_area(
+        L["deep_macro_label"],
+        placeholder=L["deep_macro_placeholder"],
+        height=80,
+    )
+
+    if "deep_result" not in st.session_state:
+        st.session_state.deep_result = None
+
+    if st.button(L["deep_run_btn"], type="primary"):
+        if not HAS_ANTHROPIC:
+            st.error(L["no_anthropic"])
+        elif not api_key:
+            st.error(L["deep_no_api"])
+        else:
+            with st.spinner(L["deep_running"]):
+                try:
+                    st.session_state.deep_result = analyze_stock_deep(
+                        api_key, ticker, price, eps, macro_context, lang=lang
+                    )
+                except Exception as ex:
+                    st.error(f"AI error: {ex}")
+
+    if st.session_state.deep_result:
+        st.divider()
+        st.markdown(f"**{L['deep_result_header']}**")
+        st.markdown(st.session_state.deep_result)
+
+
 # ── Entry point ───────────────────────────────────────────────────────────
 
 def main():
@@ -290,21 +332,30 @@ def main():
 
     params = render_sidebar(L, lang_choice)
 
-    handle_analyze(
-        params["analyze_clicked"], params["api_key"],
-        params["ticker_input"], lang, L,
-    )
+    tab_news, tab_deep = st.tabs([L["news_tab"], L["deep_tab"]])
 
-    render_ai_panel(L)
+    with tab_news:
+        handle_analyze(
+            params["analyze_clicked"], params["api_key"],
+            params["ticker_input"], lang, L,
+        )
 
-    p, e, g, r, n, pe = (params["price"], params["eps"], params["g"],
-                          params["r"], params["n"], params["pe_exit"])
+        render_ai_panel(L)
 
-    if params["mode"] == L["mode_reverse"]:
-        render_mode_a(p, e, g, r, n, pe, L)
-    elif params["mode"] == L["mode_fair"]:
-        render_mode_b(p, e, g, r, n, pe, lang_choice, L)
-    else:
-        render_mode_c(p, e, g, r, n, pe, L)
+        p, e, g, r, n, pe = (params["price"], params["eps"], params["g"],
+                              params["r"], params["n"], params["pe_exit"])
 
-    render_heatmap(p, e, g, r, n, pe, L)
+        if params["mode"] == L["mode_reverse"]:
+            render_mode_a(p, e, g, r, n, pe, L)
+        elif params["mode"] == L["mode_fair"]:
+            render_mode_b(p, e, g, r, n, pe, lang_choice, L)
+        else:
+            render_mode_c(p, e, g, r, n, pe, L)
+
+        render_heatmap(p, e, g, r, n, pe, L)
+
+    with tab_deep:
+        render_deep_analysis(
+            params["api_key"], params["ticker_input"],
+            params["price"], params["eps"], lang, L,
+        )

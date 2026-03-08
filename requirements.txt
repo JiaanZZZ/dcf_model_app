@@ -4,3 +4,4 @@ matplotlib
 pandas
 yfinance
 anthropic
+python-dotenv
