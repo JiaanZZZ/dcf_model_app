@@ -2,7 +2,10 @@
 
 A bilingual (English / 中文) interactive DCF calculator built with Streamlit, powered by Claude AI.
 Reverse-engineer what the market is pricing in, stress-test your own growth assumptions, and get AI-driven news analysis — stock by stock, earnings by earnings.
-<img width="1899" height="1029" alt="Screenshot 2026-03-07 at 16 53 42" src="https://github.com/user-attachments/assets/d5b25b75-39f8-42ea-bb25-78d1e99ce219" />
+
+<img width="1888" height="931" alt="Screenshot 2026-03-08 at 18 40 59" src="https://github.com/user-attachments/assets/51748f0a-176c-4a0e-8295-5c5f804775ce" />
+
+<img width="1909" height="941" alt="Screenshot 2026-03-08 at 18 41 15" src="https://github.com/user-attachments/assets/777b83de-f926-4625-9693-b244805db2b3" />
 
 ---
 
