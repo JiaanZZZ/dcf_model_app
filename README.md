@@ -1,7 +1,7 @@
-# DCF Market Sensing Tool
+# DCF Market Sensing Tool · AI Edition
 
-A bilingual (English / 中文) interactive DCF calculator built with Streamlit.  
-Reverse-engineer what the market is pricing in, or stress-test your own growth assumptions — stock by stock, earnings by earnings.
+A bilingual (English / 中文) interactive DCF calculator built with Streamlit, powered by Claude AI.
+Reverse-engineer what the market is pricing in, stress-test your own growth assumptions, and get AI-driven news analysis — stock by stock, earnings by earnings.
 <img width="1899" height="1029" alt="Screenshot 2026-03-07 at 16 53 42" src="https://github.com/user-attachments/assets/d5b25b75-39f8-42ea-bb25-78d1e99ce219" />
 
 ---
@@ -33,20 +33,43 @@ P₀ = EPS × (1 + g)ⁿ × PE_exit / (1 + r)ⁿ
 - **Year-by-year EPS path table** — shows how EPS compounds to the terminal value
 - **Live sensitivity heatmap** — two side-by-side contour plots showing fair value and achievable annual return across the full parameter space; white line marks your target
 
+### AI Features (NEW)
+
+- **Auto stock data fetch** — enter a ticker and click Fetch to pull live price, TTM EPS, and latest news via yfinance
+- **Claude AI news analysis** — analyzes up to 8 recent headlines and returns for each:
+  - Sentiment (bullish / bearish / neutral)
+  - Which DCF variable is affected (`g`, `r`, `PE_exit`, `EPS`) and direction (up / down / unchanged)
+  - 40-word explanation of the impact
+- **Bull & bear case summary** — Claude synthesizes the news into structured bull and bear arguments
+- **Macro regime signal** — risk-on vs risk-off assessment based on current news flow
+- **Implied g vs consensus** — whether the news implies growth above, below, or inline with analyst consensus
+
 ---
 
 ## Installation
 
 ```bash
-pip install streamlit matplotlib numpy pandas
+pip install streamlit matplotlib numpy pandas yfinance anthropic
 ```
+
+---
+
+## Setup
+
+The app reads your Anthropic API key from the environment. Add this to your `~/.zshrc` or `~/.bashrc`:
+
+```bash
+export ANTHROPIC_API_KEY="sk-ant-..."
+```
+
+Then reload: `source ~/.zshrc`
 
 ---
 
 ## Usage
 
 ```bash
-streamlit run dcf_streamlit.py
+streamlit run dcf_streamlit_ai.py
 ```
 
 Then open `http://localhost:8501` in your browser.
@@ -61,6 +84,16 @@ All parameters are controlled from the **sidebar**:
 | Required Return r | 15.0% | Your personal hurdle rate |
 | Forecast Years n | 5 | Standard DCF horizon |
 | Exit PE | 25x | Conservative assumption; adjust for sector |
+
+---
+
+## How to Use the AI Features
+
+1. Enter a ticker in the sidebar (e.g. `META`, `NVDA`, `MRVL`)
+2. Click **① Fetch** — auto-loads live price, EPS, and latest news
+3. Click **② AI Analyze** — Claude reads the headlines and returns a structured JSON analysis
+4. Review per-headline sentiment and DCF variable impact
+5. Use the bull/bear summary and macro regime signal to inform your slider adjustments
 
 ---
 
@@ -108,7 +141,9 @@ Use whichever EPS the market uses for valuation. For most US tech stocks this is
 
 ```
 .
-├── dcf_streamlit.py   # Main Streamlit app
+├── dcf_streamlit_ai.py   # Main Streamlit app (AI Edition)
+├── dcf_streamlit.py      # Original app (no AI)
+├── requirements.txt      # Python dependencies
 └── README.md
 ```
 
@@ -121,6 +156,8 @@ streamlit
 matplotlib
 numpy
 pandas
+yfinance
+anthropic
 ```
 
 ---
