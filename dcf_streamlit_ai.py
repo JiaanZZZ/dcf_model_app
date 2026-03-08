@@ -197,8 +197,14 @@ def fetch_stock_data(ticker: str):
 
     news_list = []
     for item in raw_news[:8]:
-        title = item.get("title", "")
-        link  = item.get("link", "")
+        # yfinance ≥0.2.x nests content under "content" key
+        if isinstance(item, dict) and "content" in item:
+            inner = item["content"]
+            title = inner.get("title", "")
+            link  = (inner.get("canonicalUrl") or {}).get("url", "")
+        else:
+            title = item.get("title", "")
+            link  = item.get("link", "")
         if title:
             news_list.append({"title": title, "link": link})
 
